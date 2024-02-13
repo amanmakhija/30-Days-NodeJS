@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .send-message {
+            gap: 2rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin: 10rem;
+        }
+
+        .send-message>input {
+            padding: 1rem;
+            font-size: 1.5rem;
+            border-radius: 50px;
+        }
+
+        .send-message>button {
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            transition: ease-in-out 0.3s;
+            cursor: pointer;
+        }
+
+        .send-message>button:hover {
+            background-color: #0a0a0a;
+            color: #fff;
+        }
+
+        #received-messages {
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="send-message">
+        <input type="text" id="message" placeholder="Enter message">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div id="received-messages">
+        <p>Messages will appear here - </p>
+    </div>
+
+    <script>
+        const wc = new WebSocket('ws://' + location.host + '/websocket');
+        const receivedMessages = document.getElementById('received-messages');
+        wc.onopen = () => { appendMessage('Connected'); }
+        wc.onmessage = (event) => { appendMessage(event.data); }
+        wc.onclose = () => { appendMessage('Disconnected'); }
+        wc.onerror = (err) => { appendMessage('Error: ' + err); }
+        const sendMessage = () => {
+            const message = document.getElementById('message').value;
+            wc.send(message);
+        }
+        const appendMessage = (m) => {
+            const message = document.createElement('p');
+            message.textContent = m;
+            receivedMessages.appendChild(message);
+        }
+    </script>
+</body>
+
+</html>
